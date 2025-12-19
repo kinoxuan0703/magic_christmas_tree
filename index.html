@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luxury Trump-Style Christmas Tree</title>
+    <!-- 引入更有权贵感的衬线字体 -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Playfair+Display:ital,wght@1,700&family=Noto+Serif+SC:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #000;
+            /* 增加中文字体支持 */
+            font-family: 'Playfair Display', 'Noto Serif SC', serif;
+            color: #eebb66; /* 香槟金文字 */
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            /* 深邃的黑绿金渐变背景 */
+            background: radial-gradient(circle at 50% 40%, #0a1a10 0%, #000500 60%, #000000 100%);
+        }
+        #video-container {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 160px;
+            height: 120px;
+            border-radius: 4px; /* 更锐利的边角 */
+            overflow: hidden;
+            border: 2px solid #d4af37; /* 纯金边框 */
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
+            z-index: 2;
+            transform: scaleX(-1);
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+        #video-container:hover {
+            opacity: 1;
+        }
+        #input-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* UI Layer Modification: Bottom-Left to avoid covering text */
+        #ui-layer {
+            position: absolute;
+            bottom: 20px;     /* Changed from top to bottom */
+            left: 20px;       /* Keep left */
+            top: auto;        /* Reset top */
+            z-index: 10;
+            background: rgba(0, 10, 5, 0.7); /* 深绿半透明背景 */
+            padding: 15px;    /* Reduced padding */
+            border: 1px solid #d4af37; /* 金边 */
+            border-radius: 2px; /* 方正的风格 */
+            backdrop-filter: blur(10px);
+            max-width: 240px; /* Compact width */
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.8); /* Shadow adjusted for bottom placement */
+            transform-origin: bottom left;
+        }
+        h1 {
+            font-family: 'Noto Serif SC', 'Cinzel', serif; /* 中文优先 */
+            font-size: 1.1rem; 
+            margin: 0 0 10px 0;
+            color: #ffd700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            border-bottom: 1px solid #d4af37; 
+            padding-bottom: 5px;
+        }
+        p {
+            font-size: 0.75rem; 
+            line-height: 1.4;
+            color: #ccaa77;
+            margin-bottom: 12px;
+        }
+        .control-group {
+            margin-bottom: 10px;
+            border-left: 2px solid #d4af37;
+            padding-left: 8px;
+        }
+        .upload-btn {
+            display: block;
+            text-align: center;
+            background: linear-gradient(180deg, #ffd700 0%, #b8860b 100%);
+            border: 1px solid #fff;
+            padding: 8px 15px; 
+            color: #220000;
+            font-family: 'Noto Serif SC', serif;
+            font-weight: 900;
+            font-size: 0.85rem; 
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+            letter-spacing: 1px;
+        }
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 215, 0, 0.7);
+            background: linear-gradient(180deg, #fff2cc 0%, #d4af37 100%);
+        }
+        #file-input { display: none; }
+        
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Noto Serif SC', serif; /* Keep the font style */
+            font-size: 2.0rem;
+            color: #FFD700;
+            z-index: 20;
+            text-shadow: 0 0 30px #FFD700;
+            display: block;
+            text-align: center;
+            letter-spacing: 2px;
+            white-space: nowrap;
+        }
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: #550000;
+            margin-right: 8px;
+            box-shadow: 0 0 5px #550000;
+            transform: rotate(45deg); /* 菱形点 */
+        }
+        .status-dot.active {
+            background-color: #00ff00;
+            box-shadow: 0 0 10px #00ff00;
+        }
+        
+        /* Merry Christmas Text - Trump Style */
+        #greeting-text {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-style: italic;
+            font-size: 6rem;
+            background: linear-gradient(to bottom, #fffbcc 0%, #d4af37 40%, #b8860b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.5));
+            z-index: 5;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out, transform 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            pointer-events: none;
+            white-space: nowrap;
+            letter-spacing: -2px;
+        }
+        #greeting-text.visible {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+        #greeting-text.hidden {
+            opacity: 0;
+            transform: translateX(-50%) scale(0.9);
+        }
+
+        @media (max-width: 600px) {
+            /* Mobile adjustment: Ensure UI doesn't overlap video at bottom */
+            #ui-layer { 
+                width: auto; 
+                max-width: 55%; /* Limit width so it sits left of the video */
+                left: 10px; 
+                bottom: 20px; 
+                top: auto; 
+                padding: 15px; 
+            }
+            #video-container {
+                width: 100px;
+                height: 75px;
+            }
+            #greeting-text { font-size: 3rem; top: 12%; }
+            h1 { font-size: 1.0rem; }
+        }
+    </style>
+    
+    <!-- Three.js Core (r128) -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+    
+    <!-- Post Processing Scripts (Required for Bloom/Glow) -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/CopyShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/shaders/LuminosityHighPassShader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/EffectComposer.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/ShaderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/RenderPass.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+
+    <!-- MediaPipe -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <div id="loading">Loading...</div>
+    
+    <div id="greeting-text" class="hidden">Merry Christmas</div>
+
+    <div id="ui-layer">
+        <div class="control-group">
+            <span id="camera-status" class="status-dot"></span>
+            <span id="status-text" style="color: #d4af37;">等待手势感应...</span>
+        </div>
+        
+        <label for="file-input" class="upload-btn">
+            📷 上传照片
+        </label>
+        <input type="file" id="file-input" accept="image/*" multiple>
+    </div>
+
+    <div id="canvas-container"></div>
+    
+    <div id="video-container">
+        <video id="input-video"></video>
+    </div>
+
+    <script>
+        window.addEventListener('load', function() {
+            // Check libraries
+            if (typeof THREE === 'undefined' || typeof THREE.EffectComposer === 'undefined') {
+                document.getElementById('loading').innerHTML = "资源加载失败。<br>请刷新页面重试。";
+                return;
+            }
+            initApp();
+        });
+
+        function initApp() {
+            // --- 1. Scene & Camera ---
+            const scene = new THREE.Scene();
+            // Darker fog for contrast with the bloom
+            scene.fog = new THREE.FogExp2(0x050a07, 0.003);
+
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 35;
+            camera.position.y = 12;
+            camera.lookAt(0, 8, 0);
+
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            // High contrast tone mapping
+            renderer.toneMapping = THREE.ReinhardToneMapping;
+            renderer.toneMappingExposure = 1.5;
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // --- 2. Post-Processing (The "Trump" Glow) ---
+            const renderScene = new THREE.RenderPass(scene, camera);
+
+            // Bloom Parameters: Resolution, Strength, Radius, Threshold
+            // High strength for that "filmic glow"
+            const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+            bloomPass.threshold = 0.2; // Only bright things glow
+            bloomPass.strength = 1.2;  // Very glowy
+            bloomPass.radius = 0.5;    // Wide spread
+
+            const composer = new THREE.EffectComposer(renderer);
+            composer.addPass(renderScene);
+            composer.addPass(bloomPass);
+
+            // --- 3. Lighting (Dramatic & Warm) ---
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+            scene.add(ambientLight);
+            
+            // Key light - Warm Gold
+            const mainLight = new THREE.PointLight(0xffaa00, 2.0, 150);
+            mainLight.position.set(20, 30, 20);
+            scene.add(mainLight);
+
+            // Rim light - Cool Emerald/Blue for contrast
+            const rimLight = new THREE.SpotLight(0x00ff88, 3.0);
+            rimLight.position.set(-20, 40, -10);
+            rimLight.lookAt(0, 10, 0);
+            scene.add(rimLight);
+
+            // --- 4. Materials (Luxury) ---
+            
+            // TRUMP GOLD: Very reflective, low roughness, warm amber color
+            const luxuryGoldMaterial = new THREE.MeshPhysicalMaterial({ 
+                color: 0xffcc33, 
+                emissive: 0xaa6600,
+                emissiveIntensity: 0.4, // Make it glow slightly itself
+                roughness: 0.0,   // Mirror finish
+                metalness: 1.0,   // Pure metal
+                clearcoat: 1.0,
+                clearcoatRoughness: 0.0,
+                reflectivity: 1.0
+            });
+            
+            // DEEP EMERALD: Dark, rich green, glass-like
+            const emeraldMaterial = new THREE.MeshPhysicalMaterial({ 
+                color: 0x003311, 
+                emissive: 0x001100,
+                emissiveIntensity: 0.2,
+                roughness: 0.1,
+                metalness: 0.2, // More glassy/gemstone like
+                clearcoat: 1.0, // High gloss polish
+                transmission: 0.2, // Slight transparency look
+            });
+
+            // ROYAL RUBY (New Red): Deep, rich red, slightly metallic like a car paint or gem
+            const rubyMaterial = new THREE.MeshPhysicalMaterial({ 
+                color: 0xc4001d, // Presidential Red
+                emissive: 0x330000,
+                emissiveIntensity: 0.2,
+                roughness: 0.1,
+                metalness: 0.6, 
+                clearcoat: 1.0,
+                clearcoatRoughness: 0.1,
+                reflectivity: 0.8
+            });
+
+            // DIAMOND/SILVER ACCENTS
+            const diamondMaterial = new THREE.MeshPhysicalMaterial({ 
+                color: 0xffffff,
+                emissive: 0xffffff,
+                emissiveIntensity: 0.8, // High bloom trigger
+                roughness: 0.0,
+                metalness: 1.0,
+            });
+
+            // Geometries
+            const sphereGeometry = new THREE.SphereGeometry(0.35, 32, 32); 
+            // Use Cubes for that "Gold Bar" / Building block feel
+            const boxGeometry = new THREE.BoxGeometry(0.5, 0.5, 0.5); 
+
+            const mainGroup = new THREE.Group();
+            scene.add(mainGroup);
+
+            // --- 5. The Crown Jewel (Star) ---
+            function createStarGeometry(outerRadius, innerRadius, thickness) {
+                const shape = new THREE.Shape();
+                const points = 5;
+                const angleStep = Math.PI / points;
+                for (let i = 0; i < 2 * points; i++) {
+                    const r = (i % 2 === 0) ? outerRadius : innerRadius;
+                    const a = i * angleStep + Math.PI / 2; 
+                    const x = Math.cos(a) * r;
+                    const y = Math.sin(a) * r;
+                    if (i === 0) shape.moveTo(x, y);
+                    else shape.lineTo(x, y);
+                }
+                shape.closePath();
+                const geometry = new THREE.ExtrudeGeometry(shape, { depth: thickness, bevelEnabled: true, bevelThickness: 0.1, bevelSize: 0.05, bevelSegments: 4 });
+                geometry.computeBoundingBox();
+                const zCenter = (geometry.boundingBox.max.z - geometry.boundingBox.min.z) / 2;
+                geometry.translate(0, 0, -zCenter);
+                return geometry;
+            }
+
+            const starGeometry = createStarGeometry(2.2, 1.1, 0.8);
+            const starMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0xffd700, 
+                emissive: 0xffaa00,
+                emissiveIntensity: 3.0, // Blinding brightness for bloom
+                roughness: 0.1,
+                metalness: 1.0
+            });
+            
+            const starShape = new THREE.Mesh(starGeometry, starMaterial);
+            starShape.position.set(0, 15, 0); // High position
+            
+            const starLight = new THREE.PointLight(0xffaa00, 5, 50); // Stronger light
+            starShape.add(starLight);
+            mainGroup.add(starShape);
+
+            // --- 6. Particle Generation ---
+            // Helper functions
+            function rand(min, max) { return Math.random() * (max - min) + min; }
+            function getTreePos(index, total) {
+                const h = 22; // Taller
+                const ratio = index / total;
+                const heightDistribution = Math.pow(ratio, 1.3); // Heavy bottom
+                const y = heightDistribution * h; 
+                const radius = (1 - heightDistribution) * 10; // Wider base
+                const angle = index * 0.618 * Math.PI * 10; // Golden ratio spiral
+                return new THREE.Vector3(Math.cos(angle)*radius, y - 9, Math.sin(angle)*radius);
+            }
+            function getStarPos() {
+                return new THREE.Vector3(rand(-35, 35), rand(-25, 35), rand(-20, 20));
+            }
+
+            const state = { isTree: true, targetRotation: 0, objects: [] };
+            const particleCount = 2000; // Opulent density
+
+            for (let i = 0; i < particleCount; i++) {
+                let geometry = sphereGeometry;
+                let material = luxuryGoldMaterial;
+                let scale = rand(0.4, 0.9);
+
+                const randVal = Math.random();
+                
+                // Color Distribution: 
+                // 10% Diamond (Sparkles)
+                // 20% Emerald (Green Cubes)
+                // 20% Ruby (Red Spheres) - ADDED BACK
+                // 50% Gold (Spheres & Bricks)
+                
+                if (randVal > 0.9) {
+                    material = diamondMaterial; 
+                    scale = rand(0.2, 0.5);
+                } else if (randVal > 0.7) {
+                    material = emeraldMaterial; 
+                    geometry = boxGeometry; // Cubes for emeralds
+                    scale = rand(0.5, 1.0);
+                } else if (randVal > 0.5) {
+                    // NEW: Ruby Red
+                    material = rubyMaterial;
+                    // Red fits well as spheres
+                    scale = rand(0.5, 1.0);
+                } else {
+                    // GOLD (Dominant)
+                    if (Math.random() > 0.7) geometry = boxGeometry; // Mix gold bricks
+                }
+
+                const mesh = new THREE.Mesh(geometry, material.clone());
+                mesh.scale.set(scale, scale, scale);
+                
+                const treePos = getTreePos(i, particleCount);
+                // Less jitter for a more manicured/structured look
+                treePos.x += rand(-0.3, 0.3);
+                treePos.z += rand(-0.3, 0.3);
+                treePos.y += rand(-0.3, 0.3);
+                
+                const starPos = getStarPos();
+                mesh.position.copy(treePos);
+
+                mesh.userData = {
+                    treePos: treePos,
+                    starPos: starPos,
+                    baseEmissive: material.emissiveIntensity,
+                    flashSpeed: rand(1, 3),
+                    flashOffset: rand(0, 10)
+                };
+                
+                mainGroup.add(mesh);
+                state.objects.push(mesh);
+            }
+
+            // --- 7. Photo Logic (Gold Frames) ---
+            const fileInput = document.getElementById('file-input');
+            fileInput.addEventListener('change', (e) => {
+                Array.from(e.target.files).forEach(file => {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        const img = new Image();
+                        img.src = ev.target.result;
+                        img.onload = () => createPhotoCard(img);
+                    };
+                    reader.readAsDataURL(file);
+                });
+            });
+
+            function createPhotoCard(image) {
+                const texture = new THREE.Texture(image);
+                texture.encoding = THREE.sRGBEncoding;
+                texture.needsUpdate = true;
+                
+                const aspect = image.width / image.height;
+                const height = 3.5; // Bigger photos
+                const width = height * aspect;
+
+                const geo = new THREE.PlaneGeometry(width, height);
+                const mat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide, color: 0xcccccc });
+                
+                // THICK GOLD FRAME
+                const frameGeo = new THREE.BoxGeometry(width + 0.4, height + 0.4, 0.2);
+                const frameMat = luxuryGoldMaterial; // Use the luxury gold
+                const frame = new THREE.Mesh(frameGeo, frameMat);
+                frame.position.z = -0.11;
+
+                const group = new THREE.Group();
+                group.add(new THREE.Mesh(geo, mat));
+                group.add(frame);
+
+                const i = Math.floor(Math.random() * particleCount);
+                const treePos = getTreePos(i, particleCount).multiplyScalar(1.2);
+                
+                // 关键修改：让照片在星光模式下位置更突出 (更靠近相机 Z=35)
+                // 普通星星 Z 范围是 -20 到 20，这里我们将照片设定在 5 到 25
+                const starPos = new THREE.Vector3(
+                    rand(-25, 25), // X轴范围稍收窄，集中在视野内
+                    rand(-5, 25),  // Y轴高度适中
+                    rand(5, 25)    // Z轴靠前，形成前景效果
+                );
+                
+                group.position.copy(state.isTree ? treePos : starPos);
+                group.userData = { treePos: treePos, starPos: starPos, isPhoto: true };
+                
+                mainGroup.add(group);
+                state.objects.push(group);
+            }
+
+            // --- 8. Hand Tracking ---
+            const videoElement = document.getElementById('input-video');
+            const statusText = document.getElementById('status-text');
+            const statusDot = document.getElementById('camera-status');
+            const loadingScreen = document.getElementById('loading');
+            const greetingText = document.getElementById('greeting-text');
+
+            const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+            hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+            
+            hands.onResults(results => {
+                loadingScreen.style.display = 'none';
+                if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                    state.handDetected = true;
+                    statusDot.classList.add('active');
+                    statusText.innerText = "手势感应已激活";
+                    
+                    const landmarks = results.multiHandLandmarks[0];
+                    const wrist = landmarks[0];
+                    const tips = [8, 12, 16, 20];
+                    const knuckles = [5, 9, 13, 17];
+                    let folded = 0;
+                    tips.forEach((t, i) => {
+                        if (Math.hypot(landmarks[t].x - wrist.x, landmarks[t].y - wrist.y) < 
+                            Math.hypot(landmarks[knuckles[i]].x - wrist.x, landmarks[knuckles[i]].y - wrist.y) * 1.1) folded++;
+                    });
+
+                    if (folded >= 3) {
+                        if (!state.isTree) {
+                            state.isTree = true;
+                            setTimeout(() => { if(state.isTree) greetingText.classList.replace('hidden', 'visible'); }, 400);
+                        }
+                        // 修改为英文，且简化为 Christmas Tree
+                        statusText.innerText = "Status: Christmas Tree";
+                    } else {
+                        if (state.isTree) {
+                            state.isTree = false;
+                            greetingText.classList.replace('visible', 'hidden');
+                        }
+                        // 修改为英文
+                        statusText.innerText = "Status: Stardust";
+                    }
+                    state.targetRotation = (landmarks[9].x - 0.5) * 5;
+                } else {
+                    state.handDetected = false;
+                    statusDot.classList.remove('active');
+                    statusText.innerText = "未检测到手势";
+                }
+            });
+
+            const cameraUtils = new Camera(videoElement, {
+                onFrame: async () => await hands.send({image: videoElement}),
+                width: 320, height: 240
+            });
+            cameraUtils.start();
+
+            // --- 9. Animation ---
+            const clock = new THREE.Clock();
+
+            function animate() {
+                requestAnimationFrame(animate);
+                const time = clock.getElapsedTime();
+
+                // Star motion
+                starShape.rotation.y = time * 0.5;
+                starShape.position.y = 15 + Math.sin(time * 1.5) * 0.4;
+                starLight.intensity = 4 + Math.sin(time * 3) * 1.5;
+
+                // Group rotation
+                mainGroup.rotation.y += (state.targetRotation - mainGroup.rotation.y) * 0.05;
+
+                // Particle logic
+                state.objects.forEach(obj => {
+                    const target = state.isTree ? obj.userData.treePos : obj.userData.starPos;
+                    obj.position.lerp(target, 0.05); // Snappier movement
+                    
+                    // 优化：无论什么模式，照片始终面朝相机，确保清晰可见
+                    if (obj.userData.isPhoto) {
+                        obj.lookAt(camera.position);
+                    }
+
+                    if (state.isTree) {
+                        if (!obj.userData.isPhoto) {
+                            // Sparkling diamonds and pulsating gold
+                            const flash = Math.sin(time * obj.userData.flashSpeed + obj.userData.flashOffset);
+                            if (flash > 0.8) {
+                                obj.material.emissiveIntensity = obj.userData.baseEmissive + (flash - 0.8) * 4.0;
+                            } else {
+                                obj.material.emissiveIntensity = obj.userData.baseEmissive;
+                            }
+                        }
+                    } else {
+                         // 星光模式下漂浮
+                         obj.position.y += Math.sin(time + obj.position.x) * 0.02;
+                    }
+                });
+
+                // USE COMPOSER INSTEAD OF RENDERER
+                composer.render();
+            }
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                composer.setSize(window.innerWidth, window.innerHeight);
+            });
+
+            animate();
+        }
+    </script>
+</body>
+</html>
