@@ -1,1 +1,21 @@
-🎄 Magic Christmas Tree (魔法圣诞树)这是一个基于 Web 的互动 3D 圣诞树项目，专为圣诞惊喜而设计。它利用 Three.js 进行奢华的视觉渲染，并结合 MediaPipe 实现手势控制。✨ 主要功能手势控制 (Gesture Control)🖐 张开手 (Open Hand): 树体散开，变成漫天星光 (Stardust Mode)。✊ 握拳 (Fist): 星光汇聚，组成奢华的金色圣诞树 (Christmas Tree Mode)。👋 挥手 (Wave): 控制视角的左右旋转。照片挂载 (Photo Upload)支持上传本地照片。照片会自动添加金色相框，悬浮在星空或树上，并始终面向观众。奢华视觉 (Luxury Visuals)采用 "Trump-Style" 金绿红配色。集成了 Bloom (辉光) 后期处理，营造电影级质感。🛠️ 技术栈Three.js: 3D 场景构建与渲染。MediaPipe Hands: 实时手势识别与追踪。HTML5/CSS3: 界面 UI 与布局。🚀 如何运行本地运行下载本项目代码。使用浏览器（推荐 Chrome）打开 index.html。允许摄像头权限即可开始互动。在线体验 (GitHub Pages)访问: [你的 GitHub Pages 链接将在这里]Merry Christmas! 🎁
+🎄 Magic Christmas Tree (魔法圣诞树)
+
+这是一个基于 Web 的互动 3D 圣诞树项目，专为圣诞惊喜而设计。它利用 Three.js 进行奢华的视觉渲染，并结合 MediaPipe 实现手势控制。
+
+✨ 主要功能手势控制 (Gesture Control)
+🖐 张开手 (Open Hand): 树体散开，变成漫天星光 (Stardust Mode)。
+✊ 握拳 (Fist): 星光汇聚，组成奢华的金色圣诞树 (Christmas Tree Mode)。
+👋 挥手 (Wave): 控制视角的左右旋转。照片挂载 (Photo Upload)支持上传本地照片。
+照片会自动添加金色相框，悬浮在星空或树上，并始终面向观众。
+
+奢华视觉 (Luxury Visuals)采用 "Trump-Style" 金绿红配色。
+集成了 Bloom (辉光) 后期处理，营造电影级质感。
+
+🛠️ 技术栈Three.js: 3D 场景构建与渲染。
+MediaPipe Hands: 实时手势识别与追踪。
+HTML5/CSS3: 界面 UI 与布局。
+
+🚀 如何运行本地运行下载本项目代码。
+使用浏览器（推荐 Chrome）打开 index.html。允许摄像头权限即可开始互动。在线体验 (GitHub Pages)访问: (https://kinoxuanmambaforever.github.io/magic_christmas_tree/)
+
+Merry Christmas! 🎁
